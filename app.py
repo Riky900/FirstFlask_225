@@ -9,7 +9,7 @@ def index():
     if request.method == "POST":
         time.sleep(1.5)
         nama = request.form.get("nama")
-        hasil = f"> HALLO DECK :: {nama}"
+        hasil = f"> HALLO :: {nama}"
     return render_template("index.html", hasil=hasil)
 
 if __name__ == "__main__":
