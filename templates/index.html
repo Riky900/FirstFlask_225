@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Glass System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="card" class="card glass glitch-card">
+
+    <h2 class="glitch-text" data-text="SYSTEM ONLINE">
+        SYSTEM ONLINE
+    </h2>
+
+    <form method="POST" onsubmit="return shatterGlass()">
+        <input type="text" name="nama" placeholder="Masukkan nama anda" required>
+        <button type="submit">EXECUTE</button>
+    </form>
+
+    <div id="loading" class="loading hidden">
+        <div class="terminal">
+            <pre id="terminalText"></pre>
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if hasil %}
+    <p class="glitch-text result" data-text="{{ hasil }}">
+        {{ hasil }}
+    </p>
+    {% endif %}
+
+</div>
+
+<script>
+/* ===== KACA PECAH ===== */
+function shatterGlass() {
+    const card = document.getElementById("card");
+
+    for (let i = 0; i < 26; i++) {
+        const shard = document.createElement("span");
+        shard.className = "glass-shard";
+        shard.style.left = Math.random() * 100 + "%";
+        shard.style.top = Math.random() * 100 + "%";
+        shard.style.setProperty("--dx", (Math.random() * 300 - 150) + "px");
+        shard.style.setProperty("--rot", (Math.random() * 360) + "deg");
+        card.appendChild(shard);
+    }
+
+    card.classList.add("shattered");
+
+    setTimeout(() => {
+        showLoading();
+        document.forms[0].submit();
+    }, 1200);
+
+    return false;
+}
+
+/* ===== TERMINAL LOADING ===== */
+function showLoading() {
+    const loading = document.getElementById("loading");
+    const text = document.getElementById("terminalText");
+    const bar = document.getElementById("progress");
+
+    loading.classList.remove("hidden");
+    text.textContent = "";
+    bar.style.width = "0%";
+
+    const lines = [
+        "[SYSTEM] Fragment detected...",
+        "[SYSTEM] Reconstructing glass...",
+        "[SECURITY] Verifying access...",
+        "[SYSTEM] Channel decrypted...",
+        "[OK] Access granted"
+    ];
+
+    let i = 0;
+    let progress = 0;
+
+    const interval = setInterval(() => {
+        if (i < lines.length) {
+            text.textContent += lines[i] + "\n";
+            progress += 20;
+            bar.style.width = progress + "%";
+            i++;
+        } else clearInterval(interval);
+    }, 300);
+}
+
+/* ===== MATRIX BACKGROUND ===== */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+}
+resize();
+
+const letters = "アァカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00ff99";
+    ctx.font = fontSize + "px monospace";
+
+    drops.forEach((y,i)=>{
+        const t = letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(t, i*fontSize, y*fontSize);
+        if (y*fontSize > canvas.height && Math.random() > 0.975) drops[i]=0;
+        drops[i]++;
+    });
+}
+setInterval(drawMatrix,35);
+window.onresize = resize;
+</script>
+
+</body>
+</html>
